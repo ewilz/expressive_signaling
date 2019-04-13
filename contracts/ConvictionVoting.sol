@@ -19,7 +19,6 @@ contract ConvictionVoting {
     struct Proposal {
         uint256 amount_commons;
         uint256 external_id;  // github issue id
-        address payable beneficiary;  // gitcoin beneficiary
         uint256 staked_tokens;
         uint256 sent_ether;
         uint256 conviction_last;
@@ -43,13 +42,11 @@ contract ConvictionVoting {
 
     function addProposal(
         uint256 _amount_commons,
-        uint256 _external_id,
-        address payable _beneficiary
+        uint256 _external_id
     ) external {
         proposals[proposal_counter] = Proposal(
             _amount_commons,
             _external_id,
-            _beneficiary,
             0,
             0,
             0,
@@ -62,7 +59,6 @@ contract ConvictionVoting {
     function getProposal (uint256 id) view public returns (
         uint256,
         uint256,
-        address payable,
         uint256,
         uint256,
         uint256,
@@ -72,7 +68,6 @@ contract ConvictionVoting {
         return (
             proposal.amount_commons,
             proposal.external_id,
-            proposal.beneficiary,
             proposal.staked_tokens,
             proposal.sent_ether,
             proposal.conviction_last,
@@ -113,11 +108,6 @@ contract ConvictionVoting {
 
         calculateAndSetConviction(id, old_staked);
         emit Withdrawn(id, msg.sender, proposal.staked_tokens, proposal.conviction_last);
-    }
-
-    function sendToProposal(uint256 id) payable external {
-        proposals[id].sent_ether += msg.value;
-        proposals[id].beneficiary.transfer(msg.value);
     }
 
     function calculateAndSetConviction(uint256 id, uint256 old_staked) internal {
