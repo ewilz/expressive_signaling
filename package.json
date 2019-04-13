@@ -16,7 +16,6 @@
     "zos-lib": "^2.0.0"
   },
   "devDependencies": {
-    "dotenv": "6.1.0",
     "babel-cli": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -27,7 +26,7 @@
     "chai": "^4.1.2",
     "chai-bignumber": "^2.0.2",
     "cross-env": "^5.1.4",
-    "ganache-cli": "6.1.8",
+    "dotenv": "6.1.0",
     "lk-test-helpers": "0.1.7",
     "moment": "^2.22.0",
     "snazzy": "^7.1.1",
