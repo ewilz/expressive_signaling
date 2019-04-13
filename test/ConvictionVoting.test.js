@@ -22,8 +22,8 @@ contract('ConvictionVoting', (accounts) => {
   })
 
   it('initializes', async () => {
-    await voting.addProposal(600, 1, accounts[1])
-    await voting.addProposal(1000, 2, accounts[1])
+    await voting.addProposal(600, 1)
+    await voting.addProposal(1000, 2)
 
     let prop = await voting.getProposal(1)
     console.log(prop)
