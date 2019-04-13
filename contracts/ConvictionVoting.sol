@@ -23,6 +23,8 @@ contract ConvictionVoting {
         uint256 sent_ether;
         uint256 conviction_last;
         uint256 block_last;
+        uint256 starting_block;
+        uint256 y0;
         mapping(address => uint256) stakes_per_voter;
     }
 
@@ -47,6 +49,8 @@ contract ConvictionVoting {
         proposals[proposal_counter] = Proposal(
             _amount_commons,
             _external_id,
+            0,
+            0,
             0,
             0,
             0,
@@ -85,15 +89,15 @@ contract ConvictionVoting {
         stakes_per_voter[msg.sender] += amount;
 
         Proposal storage proposal = proposals[id];
-        uint256 old_staked = proposal.staked_tokens;
+
         proposal.stakes_per_voter[msg.sender] += amount;
         proposal.staked_tokens += amount;
-
-        if (proposal.block_last == 0) {
-            proposal.block_last = block.number - TIME_UNIT;
+        if (proposal.starting_block == 0) {
+          proposal.starting_block = block.number;
         }
+        proposal.y0 = proposal.conviction_last;
 
-        calculateAndSetConviction(id, old_staked);
+        calculateAndSetConviction(id);
         emit Staked(id, msg.sender, proposal.staked_tokens, proposal.conviction_last, proposal.block_last);
     }
 
@@ -101,41 +105,35 @@ contract ConvictionVoting {
         Proposal storage proposal = proposals[id];
         require(proposal.stakes_per_voter[msg.sender] >= amount);
 
-        uint256 old_staked = proposal.staked_tokens;
-
         proposal.staked_tokens -= amount;
         stakes_per_voter[msg.sender] -= amount;
 
-        calculateAndSetConviction(id, old_staked);
+        calculateAndSetConviction(id);
         emit Withdrawn(id, msg.sender, proposal.staked_tokens, proposal.conviction_last);
     }
 
-    function calculateAndSetConviction(uint256 id, uint256 old_staked) internal {
+    function calculateAndSetConviction(uint256 id) internal {
         Proposal storage proposal = proposals[id];
 
-        // calculateConviction and store it
-        uint256 conviction = calculateConviction(
-            block.number - proposal.block_last,
-            proposal.conviction_last,
-            old_staked,
-            proposal.staked_tokens
-        );
         proposal.block_last = block.number;
+        uint256 conviction = calculateConviction(proposal);
+
         proposal.conviction_last = conviction;
         if (conviction > calculateThreshold(proposal.amount_commons)) {
             emit ProposalPassed(id, conviction);
         }
     }
 
-    function calculateConviction(uint256 time_passed, uint256 last_conv, uint256 old_amount, uint256 new_amount) view public returns(uint256 conviction) {
-        uint256 steps = time_passed / TIME_UNIT;
-        uint256 i;
-        conviction = last_conv;
-        for (i = 0; i < steps - 1; i++) {
-            conviction = CONV_ALPHA * conviction / PADD / 10 + old_amount;
-        }
-        conviction = CONV_ALPHA * conviction / PADD / 10 + new_amount;
-        return conviction;
+    function calculateConviction(Proposal memory proposal) internal  returns (uint256 conviction) {
+        uint D = 10;
+        uint aD = 90;
+        uint y0 = proposal.y0;
+        uint t = block.number - proposal.starting_block; // time increment assuming first block is time 0
+        uint x = proposal.staked_tokens;
+        uint Dt = D ** t;
+        uint aDt = aD ** t;
+
+        conviction = (aDt * y0 + (x*D*(Dt-aDt))/(D-aD)) / Dt;
     }
 
     function calculateThreshold(uint256 amount_commons) pure public returns (uint256 threshold) {
