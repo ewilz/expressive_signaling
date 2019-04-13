@@ -10,6 +10,7 @@ const ERC20Mintable = artifacts.require('ERC20Mintable')
 // const { increaseTime, latestTime } = lkTestHelpers(web3)
 
 const BONUS_PERCENTAGE = 15
+const MULTIPLIER = (10 ** 18)
 const AMOUNT_PURCHASED = 100
 
 contract('ConvictionVoting', (accounts) => {
@@ -32,17 +33,9 @@ contract('ConvictionVoting', (accounts) => {
 
     await voting.stakeToProposal(1, 5)
 
-    for(let i = 0; i < 5; i++) {
-      await mine()
-    }
-
     await voting.stakeToProposal(1, 5)
 
     await voting.stakeToProposal(1, 5)
-
-    for(let i = 0; i < 3; i++) {
-      await mine()
-    }
 
     await voting.stakeToProposal(1, 5)
 

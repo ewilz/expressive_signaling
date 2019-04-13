@@ -126,7 +126,7 @@ contract ConvictionVoting {
 
     function calculateConviction(Proposal memory proposal) internal  returns (uint256 conviction) {
         uint D = 10;
-        uint aD = 90;
+        uint aD = 9;
         uint y0 = proposal.y0;
         uint t = block.number - proposal.starting_block; // time increment assuming first block is time 0
         uint x = proposal.staked_tokens;
