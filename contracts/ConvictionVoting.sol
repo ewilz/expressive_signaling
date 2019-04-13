@@ -1,6 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import './Math.sol';
 
 contract ConvictionVoting {
@@ -19,7 +19,7 @@ contract ConvictionVoting {
     struct Proposal {
         uint256 amount_commons;
         uint256 external_id;  // github issue id
-        address beneficiary;  // gitcoin beneficiary
+        address payable beneficiary;  // gitcoin beneficiary
         uint256 staked_tokens;
         uint256 sent_ether;
         uint256 conviction_last;
@@ -44,7 +44,7 @@ contract ConvictionVoting {
     function addProposal(
         uint256 _amount_commons,
         uint256 _external_id,
-        address _beneficiary
+        address payable _beneficiary
     ) external {
         proposals[proposal_counter] = Proposal(
             _amount_commons,
@@ -62,7 +62,7 @@ contract ConvictionVoting {
     function getProposal (uint256 id) view public returns (
         uint256,
         uint256,
-        address,
+        address payable,
         uint256,
         uint256,
         uint256,
